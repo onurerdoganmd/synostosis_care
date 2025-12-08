@@ -1,0 +1,39 @@
+[
+  {
+    "username": "admin",
+    "email": "admin@synostosis.care",
+    "passwordHash": "$2b$12$psMsbxDhIHUbU9VpkXWb5uSDfMNSH.2zSNmoYPTiejD4Ofd5bOTNi",
+    "firstName": "Admin",
+    "lastName": "User",
+    "role": "admin",
+    "isActive": true,
+    "id": 1,
+    "createdAt": "2025-12-08T16:57:24.623Z",
+    "updatedAt": "2025-12-08T17:01:06.491Z",
+    "lastLogin": "2025-12-08T17:01:06.490Z"
+  },
+  {
+    "username": "testdoctor",
+    "email": "doctor@test.com",
+    "passwordHash": "$2b$12$qCYYQY0eDCLwDcZ2uekUl.68Dj1cr6NEuzCbyZY.ow.FO8xDijJfy",
+    "firstName": "Test",
+    "lastName": "Doctor",
+    "role": "doctor",
+    "isActive": true,
+    "id": 2,
+    "createdAt": "2025-12-08T17:01:54.186Z",
+    "updatedAt": "2025-12-08T17:01:54.186Z"
+  },
+  {
+    "username": "e2etest",
+    "email": "e2e@test.com",
+    "passwordHash": "$2b$12$3Yju/drkDmHEg6VDg6mV7ucEsT2wunTr3RfogAqpXB/oWjgfBrr6y",
+    "firstName": "E2E",
+    "lastName": "Test",
+    "role": "nurse",
+    "isActive": true,
+    "id": 3,
+    "createdAt": "2025-12-08T17:03:33.497Z",
+    "updatedAt": "2025-12-08T17:03:33.497Z"
+  }
+]

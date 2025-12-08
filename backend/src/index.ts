@@ -1,6 +1,7 @@
 import express, { Express, Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import authRoutes from './routes/auth.routes';
 
 // Load environment variables
 dotenv.config();
@@ -42,7 +43,7 @@ app.get('/api/v1', (_req: Request, res: Response) => {
     version: '1.0.0',
     endpoints: {
       health: '/health',
-      auth: '/api/v1/auth (Phase 1)',
+      auth: '/api/v1/auth',
       patients: '/api/v1/patients (Phase 2+)',
       surgeries: '/api/v1/surgeries (Phase 6+)',
       followups: '/api/v1/followups (Phase 9+)',
@@ -51,6 +52,9 @@ app.get('/api/v1', (_req: Request, res: Response) => {
     }
   });
 });
+
+// API Routes
+app.use('/api/v1/auth', authRoutes);
 
 // 404 handler
 app.use((_req: Request, res: Response) => {

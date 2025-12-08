@@ -13,16 +13,25 @@ export interface TokenPayload {
   role: string;
 }
 
-// Get secrets from environment variables with validation
-const JWT_SECRET = process.env.JWT_SECRET;
-const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '15m';
-const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET;
-const REFRESH_TOKEN_EXPIRES_IN = process.env.REFRESH_TOKEN_EXPIRES_IN || '7d';
-
-// Validate that secrets are set
-if (!JWT_SECRET || !REFRESH_TOKEN_SECRET) {
-  throw new Error('JWT_SECRET and REFRESH_TOKEN_SECRET must be set in environment variables');
+// Get secrets from environment variables (lazy loading to allow dotenv.config() to run first)
+function getJWTSecret(): string {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    throw new Error('JWT_SECRET must be set in environment variables');
+  }
+  return secret;
 }
+
+function getRefreshTokenSecret(): string {
+  const secret = process.env.REFRESH_TOKEN_SECRET;
+  if (!secret) {
+    throw new Error('REFRESH_TOKEN_SECRET must be set in environment variables');
+  }
+  return secret;
+}
+
+const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '15m';
+const REFRESH_TOKEN_EXPIRES_IN = process.env.REFRESH_TOKEN_EXPIRES_IN || '7d';
 
 /**
  * Generate access token
@@ -30,7 +39,7 @@ if (!JWT_SECRET || !REFRESH_TOKEN_SECRET) {
  */
 export function generateAccessToken(payload: TokenPayload): string {
   try {
-    return jwt.sign(payload, JWT_SECRET, {
+    return jwt.sign(payload, getJWTSecret(), {
       expiresIn: JWT_EXPIRES_IN,
       issuer: 'synostosis-care-api',
       subject: payload.id.toString()
@@ -47,7 +56,7 @@ export function generateAccessToken(payload: TokenPayload): string {
  */
 export function generateRefreshToken(payload: { id: number }): string {
   try {
-    return jwt.sign(payload, REFRESH_TOKEN_SECRET, {
+    return jwt.sign(payload, getRefreshTokenSecret(), {
       expiresIn: REFRESH_TOKEN_EXPIRES_IN,
       issuer: 'synostosis-care-api',
       subject: payload.id.toString()
@@ -64,7 +73,7 @@ export function generateRefreshToken(payload: { id: number }): string {
  */
 export function verifyAccessToken(token: string): TokenPayload {
   try {
-    const decoded = jwt.verify(token, JWT_SECRET, {
+    const decoded = jwt.verify(token, getJWTSecret(), {
       issuer: 'synostosis-care-api'
     }) as jwt.JwtPayload;
 
@@ -97,7 +106,7 @@ export function verifyAccessToken(token: string): TokenPayload {
  */
 export function verifyRefreshToken(token: string): number {
   try {
-    const decoded = jwt.verify(token, REFRESH_TOKEN_SECRET, {
+    const decoded = jwt.verify(token, getRefreshTokenSecret(), {
       issuer: 'synostosis-care-api'
     }) as jwt.JwtPayload;
 
