@@ -1,146 +1,168 @@
-import { useState, useEffect } from 'react';
+/**
+ * Main App Component
+ * React Router and React Query setup
+ */
 
-function App() {
-  const [apiStatus, setApiStatus] = useState<'checking' | 'connected' | 'error'>('checking');
-  const [apiMessage, setApiMessage] = useState('');
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import Layout from './components/layout/Layout';
+import Patients from './pages/Patients';
+import PatientForm from './pages/PatientForm';
+import PatientDetail from './pages/PatientDetail';
 
-  useEffect(() => {
-    // Check backend connection
-    fetch('http://localhost:5000/health')
-      .then(res => res.json())
-      .then(data => {
-        setApiStatus('connected');
-        setApiMessage(data.message);
-      })
-      .catch(() => {
-        setApiStatus('error');
-        setApiMessage('Backend is not running');
-      });
-  }, []);
+// Create a client
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      retry: 1,
+      staleTime: 5000,
+    },
+  },
+});
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      <div className="container mx-auto px-4 py-16">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-5xl font-bold text-gray-900 mb-4">
-            🏥 Craniosynostosis Patient Tracking System
-          </h1>
-          <p className="text-xl text-gray-600">
-            Comprehensive patient management from diagnosis to long-term follow-up
-          </p>
-        </div>
+// Simple Dashboard component
+const Dashboard = () => (
+  <div className="px-4 sm:px-0">
+    <div className="mb-6">
+      <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+      <p className="mt-1 text-sm text-gray-500">
+        Craniosynostosis Patient Tracking System
+      </p>
+    </div>
 
-        {/* Status Card */}
-        <div className="max-w-2xl mx-auto">
-          <div className="bg-white rounded-lg shadow-xl p-8">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-6">
-              ✅ Phase 0: Project Setup Complete
-            </h2>
-
-            {/* Backend Status */}
-            <div className="mb-6">
-              <h3 className="text-lg font-medium text-gray-700 mb-3">
-                Backend API Status:
-              </h3>
-              <div className="flex items-center space-x-3">
-                {apiStatus === 'checking' && (
-                  <>
-                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
-                    <span className="text-gray-600">Checking connection...</span>
-                  </>
-                )}
-                {apiStatus === 'connected' && (
-                  <>
-                    <span className="text-3xl">✅</span>
-                    <span className="text-green-600 font-medium">{apiMessage}</span>
-                  </>
-                )}
-                {apiStatus === 'error' && (
-                  <>
-                    <span className="text-3xl">❌</span>
-                    <span className="text-red-600 font-medium">
-                      {apiMessage} - Run: cd backend && npm run dev
-                    </span>
-                  </>
-                )}
-              </div>
-            </div>
-
-            {/* Features List */}
-            <div className="border-t pt-6">
-              <h3 className="text-lg font-medium text-gray-700 mb-4">
-                What's Been Set Up:
-              </h3>
-              <ul className="space-y-2">
-                <li className="flex items-start">
-                  <span className="text-green-500 mr-2">✓</span>
-                  <span className="text-gray-700">Backend: Node.js + Express + TypeScript</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="text-green-500 mr-2">✓</span>
-                  <span className="text-gray-700">Frontend: React + TypeScript + Vite</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="text-green-500 mr-2">✓</span>
-                  <span className="text-gray-700">Styling: Tailwind CSS configured</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="text-green-500 mr-2">✓</span>
-                  <span className="text-gray-700">Health check endpoint working</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="text-green-500 mr-2">✓</span>
-                  <span className="text-gray-700">CORS configured for local development</span>
-                </li>
-              </ul>
-            </div>
-
-            {/* Next Steps */}
-            <div className="border-t mt-6 pt-6">
-              <h3 className="text-lg font-medium text-gray-700 mb-4">
-                🎯 Next Phase:
-              </h3>
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <p className="text-blue-900 font-medium mb-2">
-                  Phase 1: Database & Authentication System
-                </p>
-                <p className="text-blue-700 text-sm">
-                  Set up PostgreSQL database with complete schema and implement JWT-based authentication
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Tech Stack */}
-        <div className="max-w-2xl mx-auto mt-8">
-          <div className="bg-white rounded-lg shadow-lg p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4 text-center">
-              Technology Stack
-            </h3>
-            <div className="grid grid-cols-2 gap-4 text-center">
-              <div className="bg-blue-50 rounded-lg p-3">
-                <p className="font-medium text-blue-900">Backend</p>
-                <p className="text-sm text-blue-700">Node.js + Express</p>
-              </div>
-              <div className="bg-purple-50 rounded-lg p-3">
-                <p className="font-medium text-purple-900">Frontend</p>
-                <p className="text-sm text-purple-700">React + TypeScript</p>
-              </div>
-              <div className="bg-green-50 rounded-lg p-3">
-                <p className="font-medium text-green-900">Database</p>
-                <p className="text-sm text-green-700">PostgreSQL (Phase 1)</p>
-              </div>
-              <div className="bg-pink-50 rounded-lg p-3">
-                <p className="font-medium text-pink-900">Styling</p>
-                <p className="text-sm text-pink-700">Tailwind CSS</p>
-              </div>
-            </div>
-          </div>
-        </div>
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="bg-white rounded-lg shadow-sm p-6">
+        <h2 className="text-lg font-semibold text-gray-900 mb-2">Patients</h2>
+        <p className="text-3xl font-bold text-blue-600">-</p>
+        <p className="text-sm text-gray-500 mt-2">Total patients</p>
+      </div>
+      <div className="bg-white rounded-lg shadow-sm p-6">
+        <h2 className="text-lg font-semibold text-gray-900 mb-2">Syndromic</h2>
+        <p className="text-3xl font-bold text-yellow-600">-</p>
+        <p className="text-sm text-gray-500 mt-2">Syndromic cases</p>
+      </div>
+      <div className="bg-white rounded-lg shadow-sm p-6">
+        <h2 className="text-lg font-semibold text-gray-900 mb-2">Active</h2>
+        <p className="text-3xl font-bold text-green-600">-</p>
+        <p className="text-sm text-gray-500 mt-2">Active patients</p>
       </div>
     </div>
+
+    <div className="mt-8 bg-white rounded-lg shadow-sm p-6">
+      <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Links</h2>
+      <div className="space-y-2">
+        <a
+          href="/patients"
+          className="block text-blue-600 hover:text-blue-800 hover:underline"
+        >
+          → View All Patients
+        </a>
+        <a
+          href="/patients/new"
+          className="block text-blue-600 hover:text-blue-800 hover:underline"
+        >
+          → Add New Patient
+        </a>
+      </div>
+    </div>
+  </div>
+);
+
+// Simple Login component
+const Login = () => {
+  const handleLogin = () => {
+    // For Phase 3, we'll use the admin token from Phase 1
+    // In production, this would be a proper login form
+    localStorage.setItem(
+      'accessToken',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJhZG1pbiIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc2NTIxNDYyMSwiZXhwIjoxNzY1MjE1NTIxLCJpc3MiOiJzeW5vc3Rvc2lzLWNhcmUtYXBpIiwic3ViIjoiMSJ9.F_4SkTtmCsf2LuWaFISbAlLRyUj6KVfnmV1yV55Y7bU'
+    );
+    window.location.href = '/';
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+      <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full">
+        <h1 className="text-2xl font-bold text-gray-900 mb-6 text-center">
+          Craniosynostosis Care
+        </h1>
+        <p className="text-sm text-gray-600 mb-6 text-center">
+          Patient Tracking System
+        </p>
+        <button
+          onClick={handleLogin}
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
+        >
+          Login as Admin (Demo)
+        </button>
+        <p className="text-xs text-gray-500 mt-4 text-center">
+          Phase 3: Patient Management UI
+        </p>
+      </div>
+    </div>
+  );
+};
+
+// Protected Route wrapper
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+  const token = localStorage.getItem('accessToken');
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
+  return <Layout>{children}</Layout>;
+};
+
+function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/patients"
+            element={
+              <ProtectedRoute>
+                <Patients />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/patients/new"
+            element={
+              <ProtectedRoute>
+                <PatientForm />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/patients/:id"
+            element={
+              <ProtectedRoute>
+                <PatientDetail />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/patients/:id/edit"
+            element={
+              <ProtectedRoute>
+                <PatientForm />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </BrowserRouter>
+    </QueryClientProvider>
   );
 }
 
