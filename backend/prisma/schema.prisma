@@ -1,0 +1,283 @@
+// Prisma Schema for Craniosynostosis Patient Tracking System
+// Generated for Phase 1
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================================
+// USER MANAGEMENT
+// ============================================================================
+
+model User {
+  id            Int       @id @default(autoincrement())
+  username      String    @unique @db.VarChar(50)
+  email         String    @unique @db.VarChar(100)
+  passwordHash  String    @map("password_hash") @db.VarChar(255)
+  firstName     String?   @map("first_name") @db.VarChar(100)
+  lastName      String?   @map("last_name") @db.VarChar(100)
+  role          String    @db.VarChar(50) // admin, surgeon, resident, nurse, researcher, viewer
+  isActive      Boolean   @default(true) @map("is_active")
+  lastLogin     DateTime? @map("last_login")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  patientsCreated      Patient[]      @relation("PatientCreatedBy")
+  diagnosesCreated     Diagnosis[]    @relation("DiagnosisCreatedBy")
+  measurementsCreated  Measurement[]  @relation("MeasurementCreatedBy")
+  surgeriesCreated     Surgery[]      @relation("SurgeryCreatedBy")
+  surgeriesPerformed   Surgery[]      @relation("SurgeryPerformedBy")
+  postopCoursesCreated PostopCourse[] @relation("PostopCourseCreatedBy")
+  followupsCreated     Followup[]     @relation("FollowupCreatedBy")
+  imagesCreated        Image[]        @relation("ImageCreatedBy")
+  auditLogs            AuditLog[]
+
+  @@map("users")
+}
+
+// ============================================================================
+// PATIENT MANAGEMENT
+// ============================================================================
+
+model Patient {
+  id                 Int       @id @default(autoincrement())
+  mrn                String    @unique @db.VarChar(50)
+  firstName          String    @map("first_name") @db.VarChar(100)
+  lastName           String    @map("last_name") @db.VarChar(100)
+  dateOfBirth        DateTime  @map("date_of_birth") @db.Date
+  gender             String?   @db.VarChar(20)
+  contactPhone       String?   @map("contact_phone") @db.VarChar(20)
+  contactEmail       String?   @map("contact_email") @db.VarChar(100)
+  address            String?   @db.Text
+  insuranceProvider  String?   @map("insurance_provider") @db.VarChar(100)
+  insuranceId        String?   @map("insurance_id") @db.VarChar(50)
+  referringPhysician String?   @map("referring_physician") @db.VarChar(100)
+  familyHistory      String?   @map("family_history") @db.Text
+  syndromic          Boolean   @default(false)
+  syndromeType       String?   @map("syndrome_type") @db.VarChar(100)
+  geneticTesting     String?   @map("genetic_testing") @db.Text
+  notes              String?   @db.Text
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @updatedAt @map("updated_at")
+  createdById        Int       @map("created_by")
+  deletedAt          DateTime? @map("deleted_at")
+
+  // Relations
+  createdBy    User          @relation("PatientCreatedBy", fields: [createdById], references: [id])
+  diagnoses    Diagnosis[]
+  measurements Measurement[]
+  surgeries    Surgery[]
+  followups    Followup[]
+  images       Image[]
+
+  @@map("patients")
+}
+
+// ============================================================================
+// DIAGNOSIS
+// ============================================================================
+
+model Diagnosis {
+  id                   Int      @id @default(autoincrement())
+  patientId            Int      @map("patient_id")
+  diagnosisDate        DateTime @map("diagnosis_date") @db.Date
+  craniosynostosisType String   @map("craniosynostosis_type") @db.VarChar(50)
+  // Types: sagittal, coronal_unilateral, coronal_bilateral, metopic, lambdoid, multiple
+  severity              String?  @map("severity") @db.VarChar(20)
+  ageAtDiagnosisDays    Int?     @map("age_at_diagnosis_days")
+  clinicalPresentation  String?  @map("clinical_presentation") @db.Text
+  associatedConditions  String?   @map("associated_conditions") @db.Text
+  createdAt             DateTime @default(now()) @map("created_at")
+  updatedAt             DateTime @updatedAt @map("updated_at")
+  createdById           Int      @map("created_by")
+
+  // Relations
+  patient   Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  createdBy User    @relation("DiagnosisCreatedBy", fields: [createdById], references: [id])
+
+  @@map("diagnoses")
+}
+
+// ============================================================================
+// MEASUREMENTS
+// ============================================================================
+
+model Measurement {
+  id                   Int      @id @default(autoincrement())
+  patientId            Int      @map("patient_id")
+  measurementDate      DateTime @map("measurement_date") @db.Date
+  measurementType      String   @map("measurement_type") @db.VarChar(50)
+  // Types: preop, postop_immediate, followup_3mo, followup_6mo, followup_1yr, etc.
+  headCircumferenceCm  Decimal? @map("head_circumference_cm") @db.Decimal(5, 2)
+  cephalicIndex        Decimal? @map("cephalic_index") @db.Decimal(5, 2)
+  cvai                 Decimal? @db.Decimal(5, 2)
+  anteriorPosteriorMm  Decimal? @map("anterior_posterior_mm") @db.Decimal(6, 2)
+  biparietal Mm        Decimal? @map("biparietal_mm") @db.Decimal(6, 2)
+  ageAtMeasurementDays Int?     @map("age_at_measurement_days")
+  notes                String?  @db.Text
+  createdAt            DateTime @default(now()) @map("created_at")
+  createdById          Int      @map("created_by")
+
+  // Relations
+  patient   Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  createdBy User    @relation("MeasurementCreatedBy", fields: [createdById], references: [id])
+
+  @@map("measurements")
+}
+
+// ============================================================================
+// SURGERY MANAGEMENT
+// ============================================================================
+
+model Surgery {
+  id                   Int       @id @default(autoincrement())
+  patientId            Int       @map("patient_id")
+  surgeryDate          DateTime  @map("surgery_date") @db.Date
+  scheduledDate        DateTime? @map("scheduled_date") @db.Date
+  procedureType        String    @map("procedure_type") @db.VarChar(100)
+  // Types: strip_craniectomy, cvr, foa, pvd, spring_assisted, endoscopic_strip, helmet_therapy
+  surgicalApproach     String?   @map("surgical_approach") @db.Text
+  primarySurgeonId     Int       @map("primary_surgeon_id")
+  surgicalTeam         String?   @map("surgical_team") @db.Text
+  durationMinutes      Int?      @map("duration_minutes")
+  estimatedBloodLossMl Int?      @map("estimated_blood_loss_ml")
+  transfusionRequired  Boolean   @default(false) @map("transfusion_required")
+  transfusionAmountMl  Int?      @map("transfusion_amount_ml")
+  hardwareUsed         String?   @map("hardware_used") @db.Text
+  intraopComplications String?   @map("intraop_complications") @db.Text
+  operativeNotes       String?   @map("operative_notes") @db.Text
+  ageAtSurgeryDays     Int?      @map("age_at_surgery_days")
+  createdAt            DateTime  @default(now()) @map("created_at")
+  updatedAt            DateTime  @updatedAt @map("updated_at")
+  createdById          Int       @map("created_by")
+
+  // Relations
+  patient        Patient       @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  primarySurgeon User          @relation("SurgeryPerformedBy", fields: [primarySurgeonId], references: [id])
+  createdBy      User          @relation("SurgeryCreatedBy", fields: [createdById], references: [id])
+  postopCourse   PostopCourse?
+  followups      Followup[]
+  images         Image[]
+
+  @@map("surgeries")
+}
+
+// ============================================================================
+// POST-OPERATIVE CARE
+// ============================================================================
+
+model PostopCourse {
+  id                 Int       @id @default(autoincrement())
+  surgeryId          Int       @unique @map("surgery_id")
+  icuAdmission       Boolean   @default(false) @map("icu_admission")
+  icuDurationHours   Int?      @map("icu_duration_hours")
+  hospitalLosDays    Int?      @map("hospital_los_days")
+  complications      String?   @db.Text
+  complicationTypes  Json?     @map("complication_types")
+  // JSON array: bleeding, infection, csf_leak, seizure, revision_needed
+  woundHealing       String?   @map("wound_healing") @db.VarChar(50)
+  medications        String?   @db.Text
+  dischargeDate      DateTime? @map("discharge_date") @db.Date
+  dischargeNotes     String?   @map("discharge_notes") @db.Text
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @updatedAt @map("updated_at")
+  createdById        Int       @map("created_by")
+
+  // Relations
+  surgery   Surgery @relation(fields: [surgeryId], references: [id], onDelete: Cascade)
+  createdBy User    @relation("PostopCourseCreatedBy", fields: [createdById], references: [id])
+
+  @@map("postop_courses")
+}
+
+// ============================================================================
+// FOLLOW-UP CARE
+// ============================================================================
+
+model Followup {
+  id                     Int       @id @default(autoincrement())
+  patientId              Int       @map("patient_id")
+  surgeryId              Int?      @map("surgery_id")
+  followupDate           DateTime  @map("followup_date") @db.Date
+  followupType           String?   @map("followup_type") @db.VarChar(50)
+  // Types: postop_2wk, postop_6wk, 3mo, 6mo, 1yr, 2yr, 5yr, other
+  daysPostSurgery        Int?      @map("days_post_surgery")
+  complications          String?   @db.Text
+  cosmeticOutcomeSurgeon Int?      @map("cosmetic_outcome_surgeon") // 1-5 rating
+  cosmeticOutcomeParent  Int?      @map("cosmetic_outcome_parent") // 1-5 rating
+  developmentalStatus    String?   @map("developmental_status") @db.Text
+  revisionNeeded         Boolean   @default(false) @map("revision_needed")
+  revisionReason         String?   @map("revision_reason") @db.Text
+  clinicalNotes          String?   @map("clinical_notes") @db.Text
+  createdAt              DateTime  @default(now()) @map("created_at")
+  updatedAt              DateTime  @updatedAt @map("updated_at")
+  createdById            Int       @map("created_by")
+
+  // Relations
+  patient   Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  surgery   Surgery? @relation(fields: [surgeryId], references: [id], onDelete: SetNull)
+  createdBy User     @relation("FollowupCreatedBy", fields: [createdById], references: [id])
+  images    Image[]
+
+  @@map("followups")
+}
+
+// ============================================================================
+// IMAGE MANAGEMENT
+// ============================================================================
+
+model Image {
+  id            Int       @id @default(autoincrement())
+  patientId     Int       @map("patient_id")
+  surgeryId     Int?      @map("surgery_id")
+  followupId    Int?      @map("followup_id")
+  imageType     String    @map("image_type") @db.VarChar(50)
+  // Types: ct_scan, 3d_reconstruction, clinical_photo, xray, mri
+  imageCategory String?   @map("image_category") @db.VarChar(50)
+  // Categories: preop, postop, followup
+  viewType      String?   @map("view_type") @db.VarChar(50)
+  // Views: frontal, lateral_left, lateral_right, top, oblique, axial, sagittal, coronal
+  filePath      String    @map("file_path") @db.VarChar(500)
+  fileName      String    @map("file_name") @db.VarChar(255)
+  fileSizeBytes BigInt?   @map("file_size_bytes")
+  mimeType      String?   @map("mime_type") @db.VarChar(100)
+  uploadDate    DateTime  @map("upload_date") @db.Date
+  description   String?   @db.Text
+  annotations   Json?
+  createdAt     DateTime  @default(now()) @map("created_at")
+  createdById   Int       @map("created_by")
+
+  // Relations
+  patient   Patient   @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  surgery   Surgery?  @relation(fields: [surgeryId], references: [id], onDelete: SetNull)
+  followup  Followup? @relation(fields: [followupId], references: [id], onDelete: SetNull)
+  createdBy User      @relation("ImageCreatedBy", fields: [createdById], references: [id])
+
+  @@map("images")
+}
+
+// ============================================================================
+// AUDIT TRAIL
+// ============================================================================
+
+model AuditLog {
+  id        Int      @id @default(autoincrement())
+  userId    Int?     @map("user_id")
+  action    String   @db.VarChar(100)
+  tableName String?  @map("table_name") @db.VarChar(50)
+  recordId  Int?     @map("record_id")
+  changes   Json?
+  ipAddress String?  @map("ip_address") @db.VarChar(50)
+  timestamp DateTime @default(now())
+
+  // Relations
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@map("audit_logs")
+}
