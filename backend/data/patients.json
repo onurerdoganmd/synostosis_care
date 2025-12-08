@@ -1,0 +1,42 @@
+[
+  {
+    "mrn": "MRN001",
+    "firstName": "John",
+    "lastName": "Doe",
+    "dateOfBirth": "2024-01-15",
+    "gender": "male",
+    "syndromic": false,
+    "createdById": 1,
+    "id": 1,
+    "createdAt": "2025-12-08T17:11:00.509Z",
+    "updatedAt": "2025-12-08T17:11:33.212Z",
+    "contactPhone": "555-1234",
+    "notes": "Updated patient record"
+  },
+  {
+    "mrn": "MRN002",
+    "firstName": "Jane",
+    "lastName": "Smith",
+    "dateOfBirth": "2023-06-20",
+    "gender": "female",
+    "syndromic": true,
+    "syndromeType": "Apert",
+    "createdById": 1,
+    "id": 2,
+    "createdAt": "2025-12-08T17:11:46.765Z",
+    "updatedAt": "2025-12-08T17:11:46.766Z"
+  },
+  {
+    "mrn": "MRN003",
+    "firstName": "Bob",
+    "lastName": "Johnson",
+    "dateOfBirth": "2024-03-10",
+    "gender": "male",
+    "syndromic": false,
+    "createdById": 1,
+    "id": 3,
+    "createdAt": "2025-12-08T17:11:46.811Z",
+    "updatedAt": "2025-12-08T17:11:58.084Z",
+    "deletedAt": "2025-12-08T17:11:58.084Z"
+  }
+]
