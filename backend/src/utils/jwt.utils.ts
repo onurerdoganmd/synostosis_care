@@ -40,7 +40,7 @@ const REFRESH_TOKEN_EXPIRES_IN = process.env.REFRESH_TOKEN_EXPIRES_IN || '7d';
 export function generateAccessToken(payload: TokenPayload): string {
   try {
     const options: jwt.SignOptions = {
-      expiresIn: JWT_EXPIRES_IN,
+      expiresIn: JWT_EXPIRES_IN as string,
       issuer: 'synostosis-care-api',
       subject: payload.id.toString()
     };
@@ -58,7 +58,7 @@ export function generateAccessToken(payload: TokenPayload): string {
 export function generateRefreshToken(payload: { id: number }): string {
   try {
     const options: jwt.SignOptions = {
-      expiresIn: REFRESH_TOKEN_EXPIRES_IN,
+      expiresIn: REFRESH_TOKEN_EXPIRES_IN as string,
       issuer: 'synostosis-care-api',
       subject: payload.id.toString()
     };
