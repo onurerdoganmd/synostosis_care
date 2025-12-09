@@ -5,7 +5,6 @@
 
 import apiClient from './api';
 import type {
-  Patient,
   CreatePatientInput,
   UpdatePatientInput,
   PatientsListResponse,
