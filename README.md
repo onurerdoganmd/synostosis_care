@@ -185,6 +185,40 @@ npm run dev
 
 **⚠️ IMPORTANT: Change the default admin password immediately after first login!**
 
+## 🐳 Docker Installation (Recommended)
+
+The easiest way to run the application is using Docker:
+
+### Quick Start with Docker
+
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/synostosis_care.git
+cd synostosis_care
+
+# (Optional) Configure environment variables
+cp .env.example .env
+# Edit .env and update JWT secrets
+
+# Build and start containers
+docker-compose up --build
+```
+
+**Access the application:**
+- Frontend: http://localhost:3000
+- Backend API: http://localhost:5000
+
+**Demo login:** Click "Login as Admin (Demo)" on the login page
+
+For detailed Docker usage, troubleshooting, and production deployment, see **[DOCKER.md](./DOCKER.md)**.
+
+### Docker Benefits
+- ✅ No need to install Node.js, PostgreSQL, or dependencies
+- ✅ Consistent environment across all systems
+- ✅ Easy updates and deployment
+- ✅ Isolated from host system
+- ✅ Production-ready configuration
+
 ## 🚀 Usage
 
 ### For Clinicians
