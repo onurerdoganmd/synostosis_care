@@ -28,7 +28,6 @@ __tests__
 Dockerfile
 .dockerignore
 docker-compose.yml
-nginx.conf
 
 # Documentation
 *.md
