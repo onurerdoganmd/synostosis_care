@@ -39,11 +39,12 @@ const REFRESH_TOKEN_EXPIRES_IN = process.env.REFRESH_TOKEN_EXPIRES_IN || '7d';
  */
 export function generateAccessToken(payload: TokenPayload): string {
   try {
-    return jwt.sign(payload, getJWTSecret(), {
+    const options: jwt.SignOptions = {
       expiresIn: JWT_EXPIRES_IN,
       issuer: 'synostosis-care-api',
       subject: payload.id.toString()
-    });
+    };
+    return jwt.sign(payload, getJWTSecret(), options);
   } catch (error) {
     console.error('Error generating access token:', error);
     throw new Error('Failed to generate access token');
@@ -56,11 +57,12 @@ export function generateAccessToken(payload: TokenPayload): string {
  */
 export function generateRefreshToken(payload: { id: number }): string {
   try {
-    return jwt.sign(payload, getRefreshTokenSecret(), {
+    const options: jwt.SignOptions = {
       expiresIn: REFRESH_TOKEN_EXPIRES_IN,
       issuer: 'synostosis-care-api',
       subject: payload.id.toString()
-    });
+    };
+    return jwt.sign(payload, getRefreshTokenSecret(), options);
   } catch (error) {
     console.error('Error generating refresh token:', error);
     throw new Error('Failed to generate refresh token');

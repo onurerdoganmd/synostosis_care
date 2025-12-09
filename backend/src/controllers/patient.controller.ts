@@ -29,7 +29,7 @@ export function listPatients(req: AuthRequest, res: Response): void {
         error: {
           code: 'VALIDATION_ERROR',
           message: 'Invalid query parameters',
-          details: queryValidation.error.errors
+          details: queryValidation.error.issues
         }
       });
       return;
@@ -97,7 +97,7 @@ export function createPatient(req: AuthRequest, res: Response): void {
         error: {
           code: 'VALIDATION_ERROR',
           message: 'Invalid patient data',
-          details: validation.error.errors
+          details: validation.error.issues
         }
       });
       return;
@@ -227,7 +227,7 @@ export function updatePatient(req: AuthRequest, res: Response): void {
         error: {
           code: 'VALIDATION_ERROR',
           message: 'Invalid patient data',
-          details: bodyValidation.error.errors
+          details: bodyValidation.error.issues
         }
       });
       return;
@@ -337,7 +337,7 @@ export function deletePatient(req: AuthRequest, res: Response): void {
  * GET /api/v1/patients/stats
  * Get patient statistics
  */
-export function getPatientStatistics(req: AuthRequest, res: Response): void {
+export function getPatientStatistics(_req: AuthRequest, res: Response): void {
   try {
     const stats = patientService.getPatientStatistics();
 
